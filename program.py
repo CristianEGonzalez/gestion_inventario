@@ -28,9 +28,16 @@ def show_inventory(): # Función para ver el inventario completo (después de ut
     output_text.delete("1.0", tk.END)
     output_text.insert(tk.END, "Inventario completo:")
 
-def search_prod():
-    # Función para filtrar en la lista seleccionable los productos que contengan determinado texto.
-    return
+def search_prod(): # Función para filtrar en la lista seleccionable los productos que contengan determinado texto.
+    search_term = search_entry.get().strip().lower()
+    product_tree.delete(*product_tree.get_children())
+    
+    for product in inventory:
+        if product[0] and (search_term in product[1].lower()):
+            product_tree.insert("", tk.END, values=([int(product[0]), product[1], int(product[2]), product[3]]))
+        
+    output_text.delete("1.0", tk.END)
+    output_text.insert(tk.END, f'Filtro actual: "{search_term}"')
 
 def clean_entries():
     # Limpiar los campos de entrada y colocar foco en el name_entry (Se usa 0,tk.END para vaciar widgets Entry)
@@ -195,7 +202,7 @@ def program():
     modify_stock_button = tk.Button(root, text="Modificar Stock", command=modify_stock)
     modify_price_button = tk.Button(root, text="Modificar Precio", command=modify_price)
     total_button = tk.Button(root, text="Calcular Valor Total", command=calculate_total_value)
-    show_inventory_button = tk.Button(root, text="Ver Inventario Completo")
+    show_inventory_button = tk.Button(root, text="Ver Inventario Completo", command=show_inventory)
     add_button.grid(row=4, column=0, padx=5, pady=10)
     del_button.grid(row=4, column=1, padx=5, pady=10)
     modify_stock_button.grid(row=5, column=0, padx=5, pady=10)
