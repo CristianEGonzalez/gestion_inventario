@@ -144,17 +144,90 @@ def delete_prod(): # Función para eliminar productos
     array_test()#######################################################
     
 
-def modify_stock():
-    # Función para modificar el stock
-    return
+def modify_stock(): # Función para modificar el stock
+    selected_item = product_tree.selection()
+    if selected_item:
+        try:
+            # Obtener los valores de las columnas del elemento seleccionado
+            product_values = product_tree.item(selected_item)["values"]
+            product_name = product_values[1]
+            new_stock = int(stock_entry.get())
+        except ValueError:
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, "Error: Por favor, ingrese un valor válido para el stock.")
+            return
+        
+        if new_stock <= 0:
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, "Error: El valor de stock debe ser mayor a 0.")
+        else:
+            for i in range(len(inventory)):
+                if inventory[i][1] == product_name:
+                    # Actualizar el stock del producto
+                    inventory[i][2] = new_stock
 
-def modify_price():
-    # Función para modificar el precio
-    return
+                    # Actualizar el valor en el product_tree
+                    product_tree.item(selected_item, values=(product_values[0],product_name, new_stock, product_values[3]))
 
-def calculate_total_value():
-    # Función para calcular el valor total del inventario
-    return
+                    # Agregar mensaje de confirmación a la salida
+                    output_text.delete("1.0", tk.END)
+                    output_text.insert(tk.END, f"Stock del producto '{product_name}' actualizado a {new_stock}.")
+                    
+                    return
+    else:
+        # Si no hay un producto seleccionado, agregar mensaje de error a la salida
+        output_text.delete("1.0", tk.END)
+        output_text.insert(tk.END, f"Error: Debes seleccionar un producto.")
+
+
+def modify_price(): # Función para modificar el precio
+    selected_item = product_tree.selection()
+    if selected_item:
+        try:
+            # Obtener los valores de las columnas del elemento seleccionado
+            product_values = product_tree.item(selected_item)["values"]
+            product_name = product_values[1]
+            new_price = round(float(price_entry.get()), 2) # Limitar el precio a dos decimales
+        except ValueError:
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, "Error: Por favor, ingrese un valor válido para el stock.")
+            return
+
+        if new_price <= 0:
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, "Error: El valor de stock debe ser mayor a 0.")
+        else:
+            for i in range(len(inventory)):
+                if inventory[i][1] == product_name:
+                    # Actualizar el precio del producto
+                    inventory[i][3]
+
+                    # Actualizar el valor del producto en el product_tree
+                    product_tree.item(selected_item, values=(product_values[0],product_name, product_values[2], new_price))
+
+                    # Agregar mensaje de confirmación a la salida
+                    output_text.delete("1.0", tk.END)
+                    output_text.insert(tk.END, f"Precio del producto '{product_name}' actualizado a {new_price}.")
+
+                    return
+    else:
+        # Si no hay un producto seleccionado, agregar mensaje de error a la salida
+        output_text.delete("1.0", tk.END)
+        output_text.insert(tk.END, f"Error: Debes seleccionar un producto.")
+
+
+
+def calculate_total_value(): # Función para calcular el valor total del inventario
+    total_value = 0
+
+    # Iterar a través del inventario y sumar el valor de cada producto multiplicado por la cantidad de existencias
+    for product in inventory:
+        if product[0]: # is not None (no es necesario escribirlo)
+            total_value += int(product[2]) * float(product[3])
+    
+    # Agregar el valor total a la salida
+    output_text.delete("1.0", tk.END)
+    output_text.insert(tk.END, f'El valor total del inventario es: ${total_value:.2f}')
 
 def sort_tree(column):
     # Función para organizar columnas
@@ -192,7 +265,7 @@ def program():
 
     search_label = tk.Label(root, text="Buscar Producto:")
     search_entry = tk.Entry(root)
-    search_button = tk.Button(root, text="Buscar")
+    search_button = tk.Button(root, text="Buscar", command=search_prod)
     search_label.grid(row=3, column=0, padx=10, pady=10)
     search_entry.grid(row=3, column=1, padx=10, pady=10)
     search_button.grid(row=3, column=2, padx=10, pady=10)
