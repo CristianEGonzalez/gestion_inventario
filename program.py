@@ -1,5 +1,6 @@
 import numpy as np
 import tkinter as tk
+from tkinter import ttk
 
 inventory = np.empty((1, 4), object) # Una matriz autoincrementable de 4 columnas
 
@@ -10,7 +11,7 @@ def exist_prod(name):
     # Comprobar si el nombre del producto está en la columna
     return name in name_column
 
-def update_prod_list():
+def clean_entries():
     # Limpiar los campos de entrada (Se usa 0,tk.END para vaciar widgets Entry)
     name_entry.delete(0, tk.END)
     stock_entry.delete(0, tk.END)
@@ -42,6 +43,7 @@ def add_prod():
         output_text.insert(tk.END, f'Error: El producto {name} ya existe en el inventario.')
     
     if stock <= 0:
+        output_text.delete("1.0", tk.END)
         output_text.insert(tk.END, "Error: El valor de stock debe ser mayor a 0.")
         return
     if price <= 0:
@@ -56,9 +58,12 @@ def add_prod():
             id = i+1
             inventory[i] = [id, name, stock, price]
 
-            update_prod_list()
+            # Agregar el producto a la lista seleccionable
+            product_tree.insert("", tk.END, values=([id,name,stock,price]))
 
-            # Test de que los productos se agregan correctamente (BORRAR)
+            clean_entries()
+
+            # Test de que los productos se agregan correctamente al array (BORRAR)
             print("-----------*------------")
             print(inventory)
 
@@ -69,14 +74,37 @@ def add_prod():
     new_inventory = np.vstack((inventory, [id, name, stock, price]))
     inventory = new_inventory
 
-    update_prod_list()
+    # Agregar el producto a la lista seleccionable
+    product_tree.insert("", tk.END, values=([id,name,stock,price]))
 
-    # Test de que los productos se agregan correctamente (BORRAR)
+    clean_entries()
+
+    # Test de que los productos se agregan correctamente al array (BORRAR)
     print("-----------*------------")
     print(inventory)
 
+def delete_prod():
+    # Función para eliminar productos
+    return
+
+def modify_stock():
+    # Función para modificar el stock
+    return
+
+def modify_price():
+    # Función para modificar el precio
+    return
+
+def calculate_total_value():
+    # Función para calcular el valor total del inventario
+    return
+
+def sort_tree(column):
+    # Función para organizar columnas
+    return
+
 def program():
-    global name_entry, stock_entry, price_entry, output_text, search_entry
+    global name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
 
     root = tk.Tk()
     root.title("Gestión de Inventario")
@@ -113,10 +141,10 @@ def program():
     search_button.grid(row=3, column=2, padx=10, pady=10)
 
     add_button = tk.Button(root, text="Agregar Producto", command=add_prod)
-    del_button = tk.Button(root, text="Eliminar Producto")
-    modify_stock_button = tk.Button(root, text="Modificar Stock")
-    modify_price_button = tk.Button(root, text="Modificar Precio")
-    total_button = tk.Button(root, text="Calcular Valor Total")
+    del_button = tk.Button(root, text="Eliminar Producto", command=delete_prod)
+    modify_stock_button = tk.Button(root, text="Modificar Stock", command=modify_stock)
+    modify_price_button = tk.Button(root, text="Modificar Precio", command=modify_price)
+    total_button = tk.Button(root, text="Calcular Valor Total", command=calculate_total_value)
     show_inventory_button = tk.Button(root, text="Ver Inventario Completo")
     add_button.grid(row=4, column=0, padx=5, pady=10)
     del_button.grid(row=4, column=1, padx=5, pady=10)
@@ -127,6 +155,29 @@ def program():
 
     output_text = tk.Text(root, height=3, width=50, highlightthickness=1, highlightbackground="gray")
     output_text.grid(row=7, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
+
+    # Agregar un Treeview
+    product_tree = ttk.Treeview(root, columns=("ID", "Nombre", "Stock", "Precio"), show="headings")
+    product_tree_scrollbar = tk.Scrollbar(root, command=product_tree.yview)
+    
+    # Establecer el título de las columnas
+    product_tree.heading("ID", text="ID")
+    product_tree.heading("Nombre", text="Nombre")
+    product_tree.heading("Stock", text="Stock")
+    product_tree.heading("Precio", text="Precio")
+    
+    # Establecer el ancho de las columnas
+    product_tree.column("ID", width=40)
+    product_tree.column("Nombre", width=200)
+    product_tree.column("Stock", width=80)
+    product_tree.column("Precio", width=80)
+    
+    # sticky="nsew" hace que el widget se expanda dentro de la celda hacia North, South, West, East
+    product_tree.grid(row=8, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+    product_tree_scrollbar.grid(row=8, column=2, padx=10, pady=10, sticky="ns")
+
+    product_tree.configure(yscrollcommand=product_tree_scrollbar.set)
+    product_tree_scrollbar.configure(command=product_tree.yview)
 
     root.grid_rowconfigure(7, weight=1)
     root.grid_columnconfigure(0, weight=1)
