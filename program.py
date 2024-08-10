@@ -4,6 +4,12 @@ from tkinter import ttk
 
 inventory = np.empty((1, 4), object) # Una matriz autoincrementable de 4 columnas
 
+def array_test():
+    # Testear al array (BORRAR)
+    print("-----------*------------")
+    print(inventory)
+
+
 def exist_prod(name):
     # Obtener la primera columna (Nombre) del inventario
     name_column = inventory[:, 1]
@@ -11,13 +17,29 @@ def exist_prod(name):
     # Comprobar si el nombre del producto está en la columna
     return name in name_column
 
+def show_inventory(): # Función para ver el inventario completo (después de utilizar una busqueda filtrada)
+    # Eliminar todos los productos que se encuentran actualmente en la lista seleccionable
+    product_tree.delete(*product_tree.get_children())
+
+    # Agregar todos los productos del inventario a la lista seleccionable
+    for product in inventory:
+        product_tree.insert("", tk.END, values=([int(product[0]), product[1], int(product[2]), product[3]]))
+    
+    output_text.delete("1.0", tk.END)
+    output_text.insert(tk.END, "Inventario completo:")
+
+def search_prod():
+    # Función para filtrar en la lista seleccionable los productos que contengan determinado texto.
+    return
+
 def clean_entries():
-    # Limpiar los campos de entrada (Se usa 0,tk.END para vaciar widgets Entry)
+    # Limpiar los campos de entrada y colocar foco en el name_entry (Se usa 0,tk.END para vaciar widgets Entry)
     name_entry.delete(0, tk.END)
     stock_entry.delete(0, tk.END)
     price_entry.delete(0, tk.END)
+    name_entry.focus_set()
 
-def add_prod():
+def add_prod(): # Función para agregar productos
     # Acceder al inventario global para sobreescribirlo luego
     global inventory
     
@@ -41,6 +63,8 @@ def add_prod():
     if exist_prod(name):
         output_text.delete("1.0", tk.END)
         output_text.insert(tk.END, f'Error: El producto {name} ya existe en el inventario.')
+        clean_entries()
+        return
     
     if stock <= 0:
         output_text.delete("1.0", tk.END)
@@ -63,9 +87,8 @@ def add_prod():
 
             clean_entries()
 
-            # Test de que los productos se agregan correctamente al array (BORRAR)
-            print("-----------*------------")
-            print(inventory)
+            # Testear al array (BORRAR)########################################
+            array_test()#######################################################
 
             return
 
@@ -79,13 +102,40 @@ def add_prod():
 
     clean_entries()
 
-    # Test de que los productos se agregan correctamente al array (BORRAR)
-    print("-----------*------------")
-    print(inventory)
+    # Testear al array (BORRAR)########################################
+    array_test()#######################################################
 
-def delete_prod():
-    # Función para eliminar productos
-    return
+def delete_prod(): # Función para eliminar productos
+    selected_items = product_tree.selection()
+    if selected_items != None: # != None es innecesario, lo puse sólo para ejemplificar que se puede usar optativamente
+        for item in selected_items:
+            # Obtener los valores de las columnas del elemento seleccionado
+            product_values = product_tree.item(item)["values"]
+            product_name = product_values[1]
+
+            # Eliminar producto de la lista
+            product_tree.delete(item)
+
+            # Buscar el producto en el inventario (array)
+            for i in range(len(inventory)):
+                if inventory[i][1] == product_name:
+                    #Eliminar producto del inventario
+                    inventory[i] = [None, None, None, None]
+                    break
+        
+        # Agregar mensaje de confirmación a la salida
+        output_text.delete("1.0", tk.END)
+        output_text.insert(tk.END, f"Producto(s) eliminado(s) del inventario.")
+
+        clean_entries()
+    else:
+        # Si no se seleccionó ningún producto, mensaje de error
+        output_text.delete("1.0", tk.END)
+        output_text.insert(tk.END, f"Error: Debes seleccionar al menos un producto.")
+    
+    # Testear al array (BORRAR)########################################
+    array_test()#######################################################
+    
 
 def modify_stock():
     # Función para modificar el stock
@@ -153,12 +203,23 @@ def program():
     total_button.grid(row=6, column=0, padx=5, pady=10)
     show_inventory_button.grid(row=6, column=1, padx=5, pady=10)
 
+    # Vincular el evento <Return> a la función add_prod() Para que al precionar **Enter** en cualquiera de estos campos agregue el producto
+    name_entry.bind("<Return>", lambda event: add_prod())
+    stock_entry.bind("<Return>", lambda event: add_prod())
+    price_entry.bind("<Return>", lambda event: add_prod())
+
+    # Vincular el evento <Return> a la función search_prod()
+    search_entry.bind("<Return>", lambda event: search_prod())
+
     output_text = tk.Text(root, height=3, width=50, highlightthickness=1, highlightbackground="gray")
     output_text.grid(row=7, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
 
-    # Agregar un Treeview
+    # Crear Treeview (Lista seleccionable)
     product_tree = ttk.Treeview(root, columns=("ID", "Nombre", "Stock", "Precio"), show="headings")
     product_tree_scrollbar = tk.Scrollbar(root, command=product_tree.yview)
+
+    # Vincular el evento <Delete> a la función delete_prod() Presionar Delete activa la función
+    product_tree.bind("<Delete>", lambda event: delete_prod())
     
     # Establecer el título de las columnas
     product_tree.heading("ID", text="ID")
@@ -181,6 +242,9 @@ def program():
 
     root.grid_rowconfigure(7, weight=1)
     root.grid_columnconfigure(0, weight=1)
+
+    # Al iniciar el programa coloca el foco en el primer campo (Entry)
+    name_entry.focus_set()
 
     root.mainloop()
 
