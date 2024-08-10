@@ -51,7 +51,7 @@ def add_prod(): # Función para agregar productos
     global inventory
     
     try:
-        name = name_entry.get().strip().capitalize()
+        name = name_entry.get().strip().title()
         stock = int(stock_entry.get())
         price = round(float(price_entry.get()), 2) # Limitar el precio a 2 decimales
     
@@ -229,9 +229,25 @@ def calculate_total_value(): # Función para calcular el valor total del inventa
     output_text.delete("1.0", tk.END)
     output_text.insert(tk.END, f'El valor total del inventario es: ${total_value:.2f}')
 
-def sort_tree(column):
-    # Función para organizar columnas
-    return
+def sort_tree(column_id, reverse=False): # Función para organizar las columnas al clickearlas
+    # Obtener los datos del Treeview
+    items = [(product_tree.set(child, column_id), child) for child in product_tree.get_children('')]
+
+    # Ordenar columnas numéricas (ID, Stock y Precio)
+    if column_id == 0 or column_id == 2 or column_id == 3:  
+        items.sort(key=lambda x: float(x[0]), reverse=reverse)
+    else:  # Ordenar columna de texto (Nombre)
+        items.sort(reverse=reverse)
+
+    # Mover los elementos del product_tree según el nuevo orden
+    for index, (value, child) in enumerate(items):
+        product_tree.move(child, '', index)
+
+    # Actualizar el estado del ordenamiento en el encabezado de la columna seleccionada
+    if reverse:
+        product_tree.heading(column_id, text=product_tree.heading(column_id)['text'], command=lambda: sort_tree(column_id, False))
+    else:
+        product_tree.heading(column_id, text=product_tree.heading(column_id)['text'], command=lambda: sort_tree(column_id, True))
 
 def program():
     global name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
@@ -302,10 +318,10 @@ def program():
     product_tree.bind("<Delete>", lambda event: delete_prod())
     
     # Establecer el título de las columnas
-    product_tree.heading("ID", text="ID")
-    product_tree.heading("Nombre", text="Nombre")
-    product_tree.heading("Stock", text="Stock")
-    product_tree.heading("Precio", text="Precio")
+    product_tree.heading("ID", text="ID", command=lambda: sort_tree(0))
+    product_tree.heading("Nombre", text="Nombre", command=lambda: sort_tree(1))
+    product_tree.heading("Stock", text="Stock", command=lambda: sort_tree(2))
+    product_tree.heading("Precio", text="Precio", command=lambda: sort_tree(3))
     
     # Establecer el ancho de las columnas
     product_tree.column("ID", width=40)
