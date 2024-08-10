@@ -1,6 +1,30 @@
 import numpy as np
 import tkinter as tk
 
+inventory = np.empty((1, 4), object) # Una matriz autoincrementable de 3 columnas
+
+def add_prod():
+    # Acceder al inventario global para sobreescribirlo luego
+    global inventory
+    
+    try:
+        name = name_entry.get().strip().capitalize()
+        stock = int(stock_entry.get())
+        price = round(float(price_entry.get()), 2) # Limitar el precio a 2 decimales
+    
+        # Comprobar que el campo de nombre no esté vacío
+        if not name:
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, "Error: El nombre del producto no puede estar vacío")
+            return
+    
+    except ValueError:
+        output_text.delete("1.0", tk.END)
+        output_text.insert(tk.END, "Error, por favor ingrese valores válidos para Stock y/o Precio")
+        return
+
+
+
 def program():
     global name_entry, stock_entry, price_entry, output_text, search_entry
 
@@ -38,7 +62,7 @@ def program():
     search_entry.grid(row=3, column=1, padx=10, pady=10)
     search_button.grid(row=3, column=2, padx=10, pady=10)
 
-    add_button = tk.Button(root, text="Agregar Producto")
+    add_button = tk.Button(root, text="Agregar Producto", command=add_prod)
     del_button = tk.Button(root, text="Eliminar Producto")
     modify_stock_button = tk.Button(root, text="Modificar Stock")
     modify_price_button = tk.Button(root, text="Modificar Precio")
