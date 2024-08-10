@@ -1,7 +1,20 @@
 import numpy as np
 import tkinter as tk
 
-inventory = np.empty((1, 4), object) # Una matriz autoincrementable de 3 columnas
+inventory = np.empty((1, 4), object) # Una matriz autoincrementable de 4 columnas
+
+def exist_prod(name):
+    # Obtener la primera columna (Nombre) del inventario
+    name_column = inventory[:, 1]
+
+    # Comprobar si el nombre del producto está en la columna
+    return name in name_column
+
+def update_prod_list():
+    # Limpiar los campos de entrada (Se usa 0,tk.END para vaciar widgets Entry)
+    name_entry.delete(0, tk.END)
+    stock_entry.delete(0, tk.END)
+    price_entry.delete(0, tk.END)
 
 def add_prod():
     # Acceder al inventario global para sobreescribirlo luego
@@ -23,7 +36,44 @@ def add_prod():
         output_text.insert(tk.END, "Error, por favor ingrese valores válidos para Stock y/o Precio")
         return
 
+    # Comprobar si el producto ya existe en el inventario
+    if exist_prod(name):
+        output_text.delete("1.0", tk.END)
+        output_text.insert(tk.END, f'Error: El producto {name} ya existe en el inventario.')
+    
+    if stock <= 0:
+        output_text.insert(tk.END, "Error: El valor de stock debe ser mayor a 0.")
+        return
+    if price <= 0:
+        output_text.delete("1.0", tk.END)
+        output_text.insert(tk.END, "Error: El precio del producto debe ser mayor a 0.")
+        return
+    
+    # Buscar la primera fila vacía en el inventario
+    for i in range(len(inventory)):
+        if inventory[i,0] is None:
+            # Agregar nuevo producto a la primera fila vacía
+            id = i+1
+            inventory[i] = [id, name, stock, price]
 
+            update_prod_list()
+
+            # Test de que los productos se agregan correctamente (BORRAR)
+            print("-----------*------------")
+            print(inventory)
+
+            return
+
+    # Si no hay filas vacías crear nuevo inventario con una fila más y reasignarlo a inventory
+    id = len(inventory)+1
+    new_inventory = np.vstack((inventory, [id, name, stock, price]))
+    inventory = new_inventory
+
+    update_prod_list()
+
+    # Test de que los productos se agregan correctamente (BORRAR)
+    print("-----------*------------")
+    print(inventory)
 
 def program():
     global name_entry, stock_entry, price_entry, output_text, search_entry
