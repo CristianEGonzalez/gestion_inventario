@@ -293,6 +293,19 @@ def load_inventory():
             # Agregar mensaje de confirmación a la salida
             output_text.delete("1.0", tk.END)
             output_text.insert(tk.END, f'Inventario cargado desde el archivo:\n "{file_path}".')
+        
+        except FileNotFoundError:
+            # Si el archivo no existe, agregar un mensaje de error a la salida:
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, "Error: El archivo seleccionado no se encontró.")
+        except json.JSONDecodeError:
+            # Si hay un error al cargar los datos JSON, agregar un mensaje de error a la salida
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, "Error: El archivo JSON está corrupto o tiene un formato incorrecto.")
+        
+    else:
+        # Si el usuario cancela la operación, no hacer nada
+        pass
 
 def sort_tree(column_id, reverse=False): # Función para organizar las columnas al clickearlas
     # Obtener los datos del Treeview
@@ -322,8 +335,8 @@ def program():
 
     menu = tk.Menu(root)
     menu2 = tk.Menu(menu, tearoff=0)
-    menu2.add_command(label="Guardar Inventario")
-    menu2.add_command(label="Cargar Inventario")
+    menu2.add_command(label="Guardar Inventario", command=save_inventory)
+    menu2.add_command(label="Cargar Inventario", command=load_inventory)
     menu2.add_command(label="Salir", command=root.quit)
     menu.add_cascade(label="Archivo", menu=menu2)
     root.config(menu=menu)
