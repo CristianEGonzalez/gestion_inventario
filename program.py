@@ -6,12 +6,6 @@ import json
 
 inventory = np.empty((1, 4), object) # Una matriz autoincrementable de 4 columnas
 
-def array_test():
-    # Testear al array (BORRAR)
-    print("-----------*------------")
-    print(inventory)
-
-
 def exist_prod(name):
     # Obtener la primera columna (Nombre) del inventario
     name_column = inventory[:, 1]
@@ -96,9 +90,6 @@ def add_prod(): # Función para agregar productos
 
             clean_entries()
 
-            # Testear al array (BORRAR)########################################
-            array_test()#######################################################
-
             return
 
     # Si no hay filas vacías crear nuevo inventario con una fila más y reasignarlo a inventory
@@ -110,9 +101,6 @@ def add_prod(): # Función para agregar productos
     product_tree.insert("", tk.END, values=([id,name,stock,price]))
 
     clean_entries()
-
-    # Testear al array (BORRAR)########################################
-    array_test()#######################################################
 
 def delete_prod(): # Función para eliminar productos
     selected_items = product_tree.selection()
@@ -141,9 +129,6 @@ def delete_prod(): # Función para eliminar productos
         # Si no se seleccionó ningún producto, mensaje de error
         output_text.delete("1.0", tk.END)
         output_text.insert(tk.END, f"Error: Debes seleccionar al menos un producto.")
-    
-    # Testear al array (BORRAR)########################################
-    array_test()#######################################################
     
 def modify_stock(): # Función para modificar el stock
     selected_item = product_tree.selection()
@@ -520,6 +505,9 @@ def program():
 
     # Al iniciar el programa coloca el foco en el primer campo (Entry)
     name_entry.focus_set()
+
+    # Establecer la función confirm_quit como el comportamiento del cierre de la ventana
+    root.protocol("WM_DELETE_WINDOW", confirm_quit)
 
     root.mainloop()
 
