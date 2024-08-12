@@ -1,6 +1,8 @@
 import numpy as np
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
+import json
 
 inventory = np.empty((1, 4), object) # Una matriz autoincrementable de 4 columnas
 
@@ -143,7 +145,6 @@ def delete_prod(): # Función para eliminar productos
     # Testear al array (BORRAR)########################################
     array_test()#######################################################
     
-
 def modify_stock(): # Función para modificar el stock
     selected_item = product_tree.selection()
     if selected_item:
@@ -178,7 +179,6 @@ def modify_stock(): # Función para modificar el stock
         # Si no hay un producto seleccionado, agregar mensaje de error a la salida
         output_text.delete("1.0", tk.END)
         output_text.insert(tk.END, f"Error: Debes seleccionar un producto.")
-
 
 def modify_price(): # Función para modificar el precio
     selected_item = product_tree.selection()
@@ -215,8 +215,6 @@ def modify_price(): # Función para modificar el precio
         output_text.delete("1.0", tk.END)
         output_text.insert(tk.END, f"Error: Debes seleccionar un producto.")
 
-
-
 def calculate_total_value(): # Función para calcular el valor total del inventario
     total_value = 0
 
@@ -228,6 +226,73 @@ def calculate_total_value(): # Función para calcular el valor total del inventa
     # Agregar el valor total a la salida
     output_text.delete("1.0", tk.END)
     output_text.insert(tk.END, f'El valor total del inventario es: ${total_value:.2f}')
+
+def save_inventory():
+    # Abrir un cuadro de diálogo para seleccionar la ubicación y nombre del archivo
+    file_path = filedialog.asksaveasfilename(
+        defaultextension=".json",
+        filetypes=[("Archivos JSON", "*.json")],
+        title="Guardar inventario"
+    )
+
+    if file_path:
+        # Convertir el inventario en una lista de diccionarios
+        inventory_data = []
+        for product in inventory:
+            if product[0] is not None:
+                inventory_data.append({
+                    "id": product[0],
+                    "name": product[1],
+                    "stock": int(product[2]),
+                    "price": float(product[3])
+                })
+        # Guardar el inventario en el archivo seleccionado
+        with open(file_path, "w") as f:
+            json.dump(inventory_data, f)
+        
+        # Agregar mensaje de confirmación a la salida
+        output_text.delete("1.0", tk.END)
+        output_text.insert(tk.END, f'Inventario guardado en el archivo "{file_path}".')
+    
+    else:
+        # Si el usuario cancela la operación no hacer nada
+        pass
+
+def load_inventory():
+    # Acceder al inventario global para luego sobreescribirlo
+    global inventory
+    
+    # Abrir un cuadro de diálogo para seleccionar el archivo a cargar
+    file_path = filedialog.askopenfilename(
+        filetypes=[("Archivos JSON", "*.json")],
+        title="Cargar inventario"
+    )
+
+    if file_path:
+        try:
+            # Cargar los datos del inventario desde el archivo JSON seleccionado
+            with open(file_path, "r") as f:
+                inventory_data = json.load(f)
+            
+            # Limpiar el inventario existente
+            for i in range(len(inventory)):
+                inventory[i] = [None, None, None, None]
+
+            # Crear una nueva matriz con la cantidad de registros(filas) como tantos productos tenga el json
+            inventory = np.empty((len(inventory_data), 4), object)
+        
+            # Limpiar el product_tree
+            for item in product_tree.get_children():
+                product_tree.delete(item)
+            
+            # Llenar el inventario y el product_tree con los datos cargados
+            for i, product in enumerate(inventory_data):
+                inventory[i] = [product["id"], product["name"], product["stock"], product["price"]]
+                product_tree.insert("", i, text=product["name"], values=(product["id"], product["name"], product["stock"], product["price"]))
+
+            # Agregar mensaje de confirmación a la salida
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, f'Inventario cargado desde el archivo:\n "{file_path}".')
 
 def sort_tree(column_id, reverse=False): # Función para organizar las columnas al clickearlas
     # Obtener los datos del Treeview
