@@ -328,7 +328,6 @@ def sort_tree(column_id, reverse=False): # Función para organizar las columnas 
         product_tree.heading(column_id, text=product_tree.heading(column_id)['text'], command=lambda: sort_tree(column_id, True))
 
 def confirm_del():
-    global confirm_root
     # Obtener las dimensiones de la ventana principal
     root_width = root.winfo_width()
     root_height = root.winfo_height()
