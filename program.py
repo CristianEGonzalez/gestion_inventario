@@ -328,6 +328,13 @@ def sort_tree(column_id, reverse=False): # Función para organizar las columnas 
         product_tree.heading(column_id, text=product_tree.heading(column_id)['text'], command=lambda: sort_tree(column_id, True))
 
 def confirm_del():
+    # La nueva ventana Toplevel se asocia con la principal.
+    confirm_del_root = tk.Toplevel(root)
+    confirm_del_root.title("Eliminar elementos")
+    confirm_del_root.transient(root)
+    # El usuario no puede usar la ventana principal hasta cerrar esta
+    confirm_del_root.grab_set()
+
     # Obtener las dimensiones de la ventana principal
     root_width = root.winfo_width()
     root_height = root.winfo_height()
@@ -337,13 +344,6 @@ def confirm_del():
     confirm_del_root_height = 320
     confirm_del_root_x = root.winfo_x() + (root_width // 2) - (confirm_del_root_width // 2)
     confirm_del_root_y = root.winfo_y() + (root_height // 2) - (confirm_del_root_height // 2)
-
-    # La nueva ventana Toplevel se asocia con la principal.
-    confirm_del_root = tk.Toplevel(root)
-    confirm_del_root.title("Eliminar elementos")
-    confirm_del_root.transient(root)
-    # El usuario no puede usar la ventana principal hasta cerrar esta
-    confirm_del_root.grab_set()
 
     # Establece la posición y el tamaño de la ventana emergente
     confirm_del_root.geometry(f"{confirm_del_root_width}x{confirm_del_root_height}+{int(confirm_del_root_x)}+{int(confirm_del_root_y)}")
@@ -384,7 +384,35 @@ def confirm_del():
         delete_tree.insert("", tk.END, values=([product_info[0],product_info[1], product_info[2], product_info[3]]))
 
 def confirm_quit():
-    return
+    quit_root = tk.Toplevel()
+    quit_root.title("Salir")
+    quit_root.transient(root)
+    quit_root.grab_set()
+
+    # Obtener las dimensiones de la ventana principal
+    root_width = root.winfo_width()
+    root_height = root.winfo_height()
+
+    # Calcula las coordenadas para centrar la ventana emergente
+    quit_root_width = 250
+    quit_root_height = 100
+    quit_root_x = root.winfo_x() + (root_width // 2) - (quit_root_width // 2)
+    quit_root_y = root.winfo_y() + (root_height // 2) - (quit_root_height // 2)
+
+    # Establece la posición y el tamaño de la ventana emergente
+    quit_root.geometry(f"{quit_root_width}x{quit_root_height}+{int(quit_root_x)}+{int(quit_root_y)}")
+
+    label = tk.Label(quit_root, text="¿Desea guardar los cambios antes de salir?")
+    label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+
+    def save_and_quit():
+        save_inventory()
+        root.quit()
+
+    confirm_button = tk.Button(quit_root, text="Guardar Cambios", command=save_and_quit)
+    cancel_button = tk.Button(quit_root, text="Salir sin Guardar", command=root.quit)
+    confirm_button.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+    cancel_button.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
 
 def program():
     global root, name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
@@ -410,7 +438,7 @@ def program():
     menu2 = tk.Menu(menu, tearoff=0)
     menu2.add_command(label="Guardar Inventario", command=save_inventory)
     menu2.add_command(label="Cargar Inventario", command=load_inventory)
-    menu2.add_command(label="Salir", command=root.quit)
+    menu2.add_command(label="Salir", command=confirm_quit)
     menu.add_cascade(label="Archivo", menu=menu2)
     root.config(menu=menu)
 
