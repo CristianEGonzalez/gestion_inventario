@@ -19,10 +19,13 @@ def show_inventory(): # Función para ver el inventario completo (después de ut
 
     # Agregar todos los productos del inventario a la lista seleccionable
     for product in inventory:
-        product_tree.insert("", tk.END, values=([int(product[0]), product[1], int(product[2]), product[3]]))
+        if product[0] != None:
+            product_tree.insert("", tk.END, values=([int(product[0]), product[1], int(product[2]), product[3]]))
     
     output_text.delete("1.0", tk.END)
     output_text.insert(tk.END, "Inventario completo:")
+    print("-----------------")
+    print(inventory)
 
 def search_prod(): # Función para filtrar en la lista seleccionable los productos que contengan determinado texto.
     search_term = search_entry.get().strip().lower()
@@ -34,6 +37,8 @@ def search_prod(): # Función para filtrar en la lista seleccionable los product
         
     output_text.delete("1.0", tk.END)
     output_text.insert(tk.END, f'Filtro actual: "{search_term}"')
+    print("-----------------")
+    print(inventory)
 
 def clean_entries():
     # Limpiar los campos de entrada y colocar foco en el name_entry (Se usa 0,tk.END para vaciar widgets Entry)
