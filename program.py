@@ -327,8 +327,65 @@ def sort_tree(column_id, reverse=False): # Función para organizar las columnas 
     else:
         product_tree.heading(column_id, text=product_tree.heading(column_id)['text'], command=lambda: sort_tree(column_id, True))
 
+def confirm_del():
+    global confirm_root
+    # Obtener las dimensiones de la ventana principal
+    root_width = root.winfo_width()
+    root_height = root.winfo_height()
+
+    # Calcula las coordenadas para centrar la ventana emergente
+    confirm_root_width = 450
+    confirm_root_height = 320
+    confirm_root_x = root.winfo_x() + (root_width // 2) - (confirm_root_width // 2)
+    confirm_root_y = root.winfo_y() + (root_height // 2) - (confirm_root_height // 2)
+
+    # La nueva ventana Toplevel se asocia con la principal.
+    confirm_root = tk.Toplevel(root)
+    confirm_root.title("Eliminar elementos")
+    confirm_root.transient(root)
+    # El usuario no puede usar la ventana principal hasta cerrar esta
+    confirm_root.grab_set()
+
+    # Establece la posición y el tamaño de la ventana emergente
+    confirm_root.geometry(f"{confirm_root_width}x{confirm_root_height}+{int(confirm_root_x)}+{int(confirm_root_y)}")
+
+    label = tk.Label(confirm_root, text="Confirma que desea eliminar los siguientes elementos: ")
+    label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+
+    def confirm_and_destroy():
+        delete_prod()
+        confirm_root.destroy()
+
+    confirm_button = tk.Button(confirm_root, text="Confirmar", command=confirm_and_destroy)
+    confirm_button.grid(row=1, column=0)
+    cancel_button = tk.Button(confirm_root, text="Cancelar", command=confirm_root.destroy)
+    cancel_button.grid(row=1, column=1)
+
+    delete_tree = ttk.Treeview(confirm_root, columns=("ID", "Nombre", "Stock", "Precio"), show="headings")
+    delete_tree_scrollbar = tk.Scrollbar(confirm_root, command=product_tree.yview)
+
+    delete_tree.heading("ID", text="ID")
+    delete_tree.heading("Nombre", text="Nombre")
+    delete_tree.heading("Stock", text="Stock")
+    delete_tree.heading("Precio", text="Precio")
+    delete_tree.column("ID", width=40)
+    delete_tree.column("Nombre", width=200)
+    delete_tree.column("Stock", width=80)
+    delete_tree.column("Precio", width=80)
+
+    delete_tree.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+    delete_tree_scrollbar.grid(row=2, column=2, padx=10, pady=10, sticky="ns")
+
+    delete_tree.configure(yscrollcommand=delete_tree_scrollbar.set)
+    delete_tree_scrollbar.configure(command=product_tree.yview)
+
+    all_selected_items = product_tree.selection()
+    for selected_item in all_selected_items:
+        product_info = product_tree.item(selected_item)["values"]
+        delete_tree.insert("", tk.END, values=([product_info[0],product_info[1], product_info[2], product_info[3]]))
+
 def program():
-    global name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
+    global root, name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
 
     root = tk.Tk()
     root.title("Gestión de Inventario")
@@ -365,7 +422,7 @@ def program():
     search_button.grid(row=3, column=2, padx=10, pady=10)
 
     add_button = tk.Button(root, text="Agregar Producto", command=add_prod)
-    del_button = tk.Button(root, text="Eliminar Producto", command=delete_prod)
+    del_button = tk.Button(root, text="Eliminar Producto", command=confirm_del)
     modify_stock_button = tk.Button(root, text="Modificar Stock", command=modify_stock)
     modify_price_button = tk.Button(root, text="Modificar Precio", command=modify_price)
     total_button = tk.Button(root, text="Calcular Valor Total", command=calculate_total_value)
@@ -393,7 +450,7 @@ def program():
     product_tree_scrollbar = tk.Scrollbar(root, command=product_tree.yview)
 
     # Vincular el evento <Delete> a la función delete_prod() Presionar Delete activa la función
-    product_tree.bind("<Delete>", lambda event: delete_prod())
+    product_tree.bind("<Delete>", lambda event: confirm_del())
     
     # Establecer el título de las columnas
     product_tree.heading("ID", text="ID", command=lambda: sort_tree(0))
