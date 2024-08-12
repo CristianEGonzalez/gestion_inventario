@@ -333,35 +333,35 @@ def confirm_del():
     root_height = root.winfo_height()
 
     # Calcula las coordenadas para centrar la ventana emergente
-    confirm_root_width = 450
-    confirm_root_height = 320
-    confirm_root_x = root.winfo_x() + (root_width // 2) - (confirm_root_width // 2)
-    confirm_root_y = root.winfo_y() + (root_height // 2) - (confirm_root_height // 2)
+    confirm_del_root_width = 450
+    confirm_del_root_height = 320
+    confirm_del_root_x = root.winfo_x() + (root_width // 2) - (confirm_del_root_width // 2)
+    confirm_del_root_y = root.winfo_y() + (root_height // 2) - (confirm_del_root_height // 2)
 
     # La nueva ventana Toplevel se asocia con la principal.
-    confirm_root = tk.Toplevel(root)
-    confirm_root.title("Eliminar elementos")
-    confirm_root.transient(root)
+    confirm_del_root = tk.Toplevel(root)
+    confirm_del_root.title("Eliminar elementos")
+    confirm_del_root.transient(root)
     # El usuario no puede usar la ventana principal hasta cerrar esta
-    confirm_root.grab_set()
+    confirm_del_root.grab_set()
 
     # Establece la posición y el tamaño de la ventana emergente
-    confirm_root.geometry(f"{confirm_root_width}x{confirm_root_height}+{int(confirm_root_x)}+{int(confirm_root_y)}")
+    confirm_del_root.geometry(f"{confirm_del_root_width}x{confirm_del_root_height}+{int(confirm_del_root_x)}+{int(confirm_del_root_y)}")
 
-    label = tk.Label(confirm_root, text="Confirma que desea eliminar los siguientes elementos: ")
+    label = tk.Label(confirm_del_root, text="Confirma que desea eliminar los siguientes elementos: ")
     label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
     def confirm_and_destroy():
         delete_prod()
-        confirm_root.destroy()
+        confirm_del_root.destroy()
 
-    confirm_button = tk.Button(confirm_root, text="Confirmar", command=confirm_and_destroy)
+    confirm_button = tk.Button(confirm_del_root, text="Confirmar", command=confirm_and_destroy)
     confirm_button.grid(row=1, column=0)
-    cancel_button = tk.Button(confirm_root, text="Cancelar", command=confirm_root.destroy)
+    cancel_button = tk.Button(confirm_del_root, text="Cancelar", command=confirm_del_root.destroy)
     cancel_button.grid(row=1, column=1)
 
-    delete_tree = ttk.Treeview(confirm_root, columns=("ID", "Nombre", "Stock", "Precio"), show="headings")
-    delete_tree_scrollbar = tk.Scrollbar(confirm_root, command=product_tree.yview)
+    delete_tree = ttk.Treeview(confirm_del_root, columns=("ID", "Nombre", "Stock", "Precio"), show="headings")
+    delete_tree_scrollbar = tk.Scrollbar(confirm_del_root, command=product_tree.yview)
 
     delete_tree.heading("ID", text="ID")
     delete_tree.heading("Nombre", text="Nombre")
@@ -383,11 +383,28 @@ def confirm_del():
         product_info = product_tree.item(selected_item)["values"]
         delete_tree.insert("", tk.END, values=([product_info[0],product_info[1], product_info[2], product_info[3]]))
 
+def confirm_quit():
+    return
+
 def program():
     global root, name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
 
     root = tk.Tk()
     root.title("Gestión de Inventario")
+
+    # Obtener el ancho y alto de la pantalla
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+
+    # Calcular la posición x para centrar horizontalmente
+    x = (screen_width - root.winfo_reqwidth()) // 2
+
+    # Calcular la posición y para que la ventana quede un poco por encima del centro
+    window_height = root.winfo_reqheight()
+    y = (screen_height - window_height) // 4
+
+    # Establecer la posición de la ventana
+    root.geometry(f"+{x}+{y}")
 
     menu = tk.Menu(root)
     menu2 = tk.Menu(menu, tearoff=0)
