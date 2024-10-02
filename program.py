@@ -1,7 +1,6 @@
 import numpy as np
 import tkinter as tk
-from tkinter import ttk
-from tkinter import filedialog
+from tkinter import ttk, filedialog
 import json
 
 inventory = np.empty((1, 4), object) # Una matriz autoincrementable de 4 columnas
@@ -24,8 +23,6 @@ def show_inventory(): # Función para ver el inventario completo (después de ut
     
     output_text.delete("1.0", tk.END)
     output_text.insert(tk.END, "Inventario completo:")
-    print("-----------------")
-    print(inventory)
 
 def search_prod(): # Función para filtrar en la lista seleccionable los productos que contengan determinado texto.
     search_term = search_entry.get().strip().lower()
@@ -37,8 +34,6 @@ def search_prod(): # Función para filtrar en la lista seleccionable los product
         
     output_text.delete("1.0", tk.END)
     output_text.insert(tk.END, f'Filtro actual: "{search_term}"')
-    print("-----------------")
-    print(inventory)
 
 def clean_entries():
     # Limpiar los campos de entrada y colocar foco en el name_entry (Se usa 0,tk.END para vaciar widgets Entry)
@@ -324,6 +319,7 @@ def confirm_del():
     confirm_del_root.transient(root)
     # El usuario no puede usar la ventana principal hasta cerrar esta
     confirm_del_root.grab_set()
+    confirm_del_root.configure(bg="#E6E6FA")
 
     # Obtener las dimensiones de la ventana principal
     root_width = root.winfo_width()
@@ -331,15 +327,16 @@ def confirm_del():
 
     # Calcula las coordenadas para centrar la ventana emergente
     confirm_del_root_width = 450
-    confirm_del_root_height = 320
+    confirm_del_root_height = 400
     confirm_del_root_x = root.winfo_x() + (root_width // 2) - (confirm_del_root_width // 2)
     confirm_del_root_y = root.winfo_y() + (root_height // 2) - (confirm_del_root_height // 2)
 
     # Establece la posición y el tamaño de la ventana emergente
     confirm_del_root.geometry(f"{confirm_del_root_width}x{confirm_del_root_height}+{int(confirm_del_root_x)}+{int(confirm_del_root_y)}")
 
-    label = tk.Label(confirm_del_root, text="Confirma que desea eliminar los siguientes elementos: ")
-    label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+    del_label = tk.Label(confirm_del_root, text="Confirma que desea eliminar los siguientes elementos: ")
+    apply_violet_label(del_label)
+    del_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
     def confirm_and_destroy():
         delete_prod()
@@ -347,8 +344,10 @@ def confirm_del():
 
     confirm_button = tk.Button(confirm_del_root, text="Confirmar", command=confirm_and_destroy)
     confirm_button.grid(row=1, column=0)
+    apply_violet_button(confirm_button)
     cancel_button = tk.Button(confirm_del_root, text="Cancelar", command=confirm_del_root.destroy)
     cancel_button.grid(row=1, column=1)
+    apply_violet_button(cancel_button)
 
     delete_tree = ttk.Treeview(confirm_del_root, columns=("ID", "Nombre", "Stock", "Precio"), show="headings")
     delete_tree_scrollbar = tk.Scrollbar(confirm_del_root, command=product_tree.yview)
@@ -404,11 +403,23 @@ def confirm_quit():
     confirm_button.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
     cancel_button.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
 
+
+# Estilos para widgets
+def apply_violet_button(widget):
+    widget.configure(bg="#9B5DE5", fg="white", activebackground="#6A0572", relief="flat", font=("Calibri", 12, "bold"), bd=0, padx=10, pady=5, width=20)
+
+def apply_violet_entry(widget):
+    widget.configure(bg="#E0BBE4", fg="black", font=("Times", 11), relief="flat", highlightbackground="#9B5DE5", highlightcolor="#9B5DE5", highlightthickness=2)
+
+def apply_violet_label(widget):
+    widget.configure(bg="#E6E6FA", fg="#5D3FD3", font=("Times", 12, "bold"))
+
 def program():
     global root, name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
 
     root = tk.Tk()
     root.title("Gestión de Inventario")
+    root.configure(bg="#E6E6FA")
 
     # Obtener el ancho y alto de la pantalla
     screen_width = root.winfo_screenwidth()
@@ -424,49 +435,66 @@ def program():
     # Establecer la posición de la ventana
     root.geometry(f"+{x}+{y}")
 
-    menu = tk.Menu(root)
-    menu2 = tk.Menu(menu, tearoff=0)
+    menu = tk.Menu(root, bg="#E6E6FA", fg="black")  # Establecer colores de fondo y texto para el menú
+    menu2 = tk.Menu(menu, tearoff=0, bg="#E6E6FA", fg="black", font=("Times", 11))  # Establecer colores de fondo y texto para el submenú
     menu2.add_command(label="Guardar Inventario", command=save_inventory)
     menu2.add_command(label="Cargar Inventario", command=load_inventory)
     menu2.add_command(label="Salir", command=confirm_quit)
     menu.add_cascade(label="Archivo", menu=menu2)
     root.config(menu=menu)
+    
 
+    
     # Crear los widgets
     name_label = tk.Label(root, text="Nombre del producto:")
+    apply_violet_label(name_label)
     name_entry = tk.Entry(root)
+    apply_violet_entry(name_entry)
     name_label.grid(row=0, column=0, padx=10, pady=10)
     name_entry.grid(row=0, column=1, padx=10, pady=10)
 
     stock_label = tk.Label(root, text="Stock:")
+    apply_violet_label(stock_label)
     stock_entry = tk.Spinbox(root, from_=0, to=100, width=5)
+    apply_violet_entry(stock_entry)
     stock_label.grid(row=1, column=0, padx=10, pady=10)
     stock_entry.grid(row=1, column=1, padx=10, pady=10)
 
     price_label = tk.Label(root, text="Precio unitario:")
+    apply_violet_label(price_label)
     price_entry = tk.Entry(root)
+    apply_violet_entry(price_entry)
     price_label.grid(row=2, column=0, padx=10, pady=10)
     price_entry.grid(row=2, column=1, padx=10, pady=10)
 
     search_label = tk.Label(root, text="Buscar Producto:")
+    apply_violet_label(search_label)
     search_entry = tk.Entry(root)
+    apply_violet_entry(search_entry)
     search_button = tk.Button(root, text="Buscar", command=search_prod)
+    apply_violet_button(search_button)
     search_label.grid(row=3, column=0, padx=10, pady=10)
     search_entry.grid(row=3, column=1, padx=10, pady=10)
     search_button.grid(row=3, column=2, padx=10, pady=10)
 
     add_button = tk.Button(root, text="Agregar Producto", command=add_prod)
+    apply_violet_button(add_button)
     del_button = tk.Button(root, text="Eliminar Producto", command=confirm_del)
+    apply_violet_button(del_button)
     modify_stock_button = tk.Button(root, text="Modificar Stock", command=modify_stock)
+    apply_violet_button(modify_stock_button)
     modify_price_button = tk.Button(root, text="Modificar Precio", command=modify_price)
+    apply_violet_button(modify_price_button)
     total_button = tk.Button(root, text="Calcular Valor Total", command=calculate_total_value)
+    apply_violet_button(total_button)
     show_inventory_button = tk.Button(root, text="Ver Inventario Completo", command=show_inventory)
+    apply_violet_button(show_inventory_button)
     add_button.grid(row=4, column=0, padx=5, pady=10)
     del_button.grid(row=4, column=1, padx=5, pady=10)
-    modify_stock_button.grid(row=5, column=0, padx=5, pady=10)
-    modify_price_button.grid(row=5, column=1, padx=5, pady=10)
-    total_button.grid(row=6, column=0, padx=5, pady=10)
-    show_inventory_button.grid(row=6, column=1, padx=5, pady=10)
+    modify_stock_button.grid(row=4, column=2, padx=5, pady=10)
+    modify_price_button.grid(row=5, column=0, padx=5, pady=10)
+    total_button.grid(row=5, column=1, padx=5, pady=10)
+    show_inventory_button.grid(row=5, column=2, padx=5, pady=10)
 
     # Vincular el evento <Return> a la función add_prod() Para que al precionar **Enter** en cualquiera de estos campos agregue el producto
     name_entry.bind("<Return>", lambda event: add_prod())
@@ -476,8 +504,24 @@ def program():
     # Vincular el evento <Return> a la función search_prod()
     search_entry.bind("<Return>", lambda event: search_prod())
 
-    output_text = tk.Text(root, height=3, width=50, highlightthickness=1, highlightbackground="gray")
+    output_text = tk.Text(root, height=3, width=50, highlightthickness=1, highlightbackground="gray", bg="#F3E8FF", fg="#5D3FD3", font=("Times", 12))
     output_text.grid(row=7, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
+
+
+    # Crear un estilo para el Treeview
+    style = ttk.Style()
+    # Configurar el estilo del Treeview
+    style.configure("Treeview",
+                    background="#E6E6FA",  # Color de fondo
+                    foreground="#5D3FD3",  # Color del texto
+                    rowheight=25,          # Altura de las filas
+                    font=("Times", 12))    # Fuente de las filas
+
+    # Configurar el estilo del encabezado
+    style.configure("Treeview.Heading",
+                    background="#A45DBD",  # Color de fondo del encabezado (violeta más claro)
+                    foreground="#5D3FD3",   # Color del texto del encabezado (violeta oscuro)
+                    font=("Times", 12, "bold"))  # Fuente del encabezado
 
     # Crear Treeview (Lista seleccionable)
     product_tree = ttk.Treeview(root, columns=("ID", "Nombre", "Stock", "Precio"), show="headings")
@@ -499,8 +543,8 @@ def program():
     product_tree.column("Precio", width=80)
     
     # sticky="nsew" hace que el widget se expanda dentro de la celda hacia North, South, West, East
-    product_tree.grid(row=8, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
-    product_tree_scrollbar.grid(row=8, column=2, padx=10, pady=10, sticky="ns")
+    product_tree.grid(row=8, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
+    product_tree_scrollbar.grid(row=8, column=3, padx=10, pady=10, sticky="ns")
 
     product_tree.configure(yscrollcommand=product_tree_scrollbar.set)
     product_tree_scrollbar.configure(command=product_tree.yview)
