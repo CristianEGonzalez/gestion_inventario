@@ -313,78 +313,82 @@ def sort_tree(column_id, reverse=False): # Función para organizar las columnas 
         product_tree.heading(column_id, text=product_tree.heading(column_id)['text'], command=lambda: sort_tree(column_id, True))
 
 def confirm_del():
-    # La nueva ventana Toplevel se asocia con la principal.
-    confirm_del_root = tk.Toplevel(root)
-    confirm_del_root.title("Eliminar elementos")
-    confirm_del_root.transient(root)
-    # El usuario no puede usar la ventana principal hasta cerrar esta
-    confirm_del_root.grab_set()
-    confirm_del_root.configure(bg="#E6E6FA")
+    if product_tree.selection():
+        # La nueva ventana Toplevel se asocia con la principal.
+        confirm_del_root = tk.Toplevel(root)
+        confirm_del_root.title("Eliminar elementos")
+        confirm_del_root.transient(root)
+        # El usuario no puede usar la ventana principal hasta cerrar esta
+        confirm_del_root.grab_set()
+        confirm_del_root.configure(bg="#E6E6FA")
 
-    # Obtener las dimensiones de la ventana principal
-    root_width = root.winfo_width()
-    root_height = root.winfo_height()
+        # Obtener las dimensiones de la ventana principal
+        root_width = root.winfo_width()
+        root_height = root.winfo_height()
 
-    # Calcula las coordenadas para centrar la ventana emergente
-    confirm_del_root_width = 450
-    confirm_del_root_height = 400
-    confirm_del_root_x = root.winfo_x() + (root_width // 2) - (confirm_del_root_width // 2)
-    confirm_del_root_y = root.winfo_y() + (root_height // 2) - (confirm_del_root_height // 2)
+        # Calcula las coordenadas para centrar la ventana emergente
+        confirm_del_root_width = 450
+        confirm_del_root_height = 400
+        confirm_del_root_x = root.winfo_x() + (root_width // 2) - (confirm_del_root_width // 2)
+        confirm_del_root_y = root.winfo_y() + (root_height // 2) - (confirm_del_root_height // 2)
 
-    # Establece la posición y el tamaño de la ventana emergente
-    confirm_del_root.geometry(f"{confirm_del_root_width}x{confirm_del_root_height}+{int(confirm_del_root_x)}+{int(confirm_del_root_y)}")
+        # Establece la posición y el tamaño de la ventana emergente
+        confirm_del_root.geometry(f"{confirm_del_root_width}x{confirm_del_root_height}+{int(confirm_del_root_x)}+{int(confirm_del_root_y)}")
 
-    del_label = tk.Label(confirm_del_root, text="Confirma que desea eliminar los siguientes elementos: ")
-    apply_violet_label(del_label)
-    del_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        del_label = tk.Label(confirm_del_root, text="Confirma que desea eliminar los siguientes elementos: ")
+        apply_violet_label(del_label)
+        del_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
-    def confirm_and_destroy():
-        delete_prod()
-        confirm_del_root.destroy()
+        def confirm_and_destroy():
+            delete_prod()
+            confirm_del_root.destroy()
 
-    confirm_button = tk.Button(confirm_del_root, text="Confirmar", command=confirm_and_destroy)
-    confirm_button.grid(row=1, column=0)
-    apply_violet_button(confirm_button)
-    cancel_button = tk.Button(confirm_del_root, text="Cancelar", command=confirm_del_root.destroy)
-    cancel_button.grid(row=1, column=1)
-    apply_violet_button(cancel_button)
+        confirm_button = tk.Button(confirm_del_root, text="Confirmar", command=confirm_and_destroy)
+        confirm_button.grid(row=1, column=0)
+        apply_violet_button(confirm_button)
+        cancel_button = tk.Button(confirm_del_root, text="Cancelar", command=confirm_del_root.destroy)
+        cancel_button.grid(row=1, column=1)
+        apply_violet_button(cancel_button)
 
-    delete_tree = ttk.Treeview(confirm_del_root, columns=("ID", "Nombre", "Stock", "Precio"), show="headings")
-    delete_tree_scrollbar = tk.Scrollbar(confirm_del_root, command=product_tree.yview)
+        delete_tree = ttk.Treeview(confirm_del_root, columns=("ID", "Nombre", "Stock", "Precio"), show="headings")
+        delete_tree_scrollbar = tk.Scrollbar(confirm_del_root, command=product_tree.yview)
 
-    delete_tree.heading("ID", text="ID")
-    delete_tree.heading("Nombre", text="Nombre")
-    delete_tree.heading("Stock", text="Stock")
-    delete_tree.heading("Precio", text="Precio")
-    delete_tree.column("ID", width=40)
-    delete_tree.column("Nombre", width=200)
-    delete_tree.column("Stock", width=80)
-    delete_tree.column("Precio", width=80)
+        delete_tree.heading("ID", text="ID")
+        delete_tree.heading("Nombre", text="Nombre")
+        delete_tree.heading("Stock", text="Stock")
+        delete_tree.heading("Precio", text="Precio")
+        delete_tree.column("ID", width=40)
+        delete_tree.column("Nombre", width=200)
+        delete_tree.column("Stock", width=80)
+        delete_tree.column("Precio", width=80)
 
-    delete_tree.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
-    delete_tree_scrollbar.grid(row=2, column=2, padx=10, pady=10, sticky="ns")
+        delete_tree.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        delete_tree_scrollbar.grid(row=2, column=2, padx=10, pady=10, sticky="ns")
 
-    delete_tree.configure(yscrollcommand=delete_tree_scrollbar.set)
-    delete_tree_scrollbar.configure(command=product_tree.yview)
+        delete_tree.configure(yscrollcommand=delete_tree_scrollbar.set)
+        delete_tree_scrollbar.configure(command=product_tree.yview)
 
-    all_selected_items = product_tree.selection()
-    for selected_item in all_selected_items:
-        product_info = product_tree.item(selected_item)["values"]
-        delete_tree.insert("", tk.END, values=([product_info[0],product_info[1], product_info[2], product_info[3]]))
+        all_selected_items = product_tree.selection()
+        for selected_item in all_selected_items:
+            product_info = product_tree.item(selected_item)["values"]
+            delete_tree.insert("", tk.END, values=([product_info[0],product_info[1], product_info[2], product_info[3]]))
 
 def confirm_quit():
     quit_root = tk.Toplevel()
     quit_root.title("Salir")
     quit_root.transient(root)
     quit_root.grab_set()
+    quit_root.grid_columnconfigure(0, weight=1)  # Permitir que la columna 0 se expanda
+    quit_root.grid_columnconfigure(1, weight=1)  # Permitir que la columna 1 se expanda
+    quit_root.configure(bg="#E6E6FA")
 
     # Obtener las dimensiones de la ventana principal
     root_width = root.winfo_width()
     root_height = root.winfo_height()
 
     # Calcula las coordenadas para centrar la ventana emergente
-    quit_root_width = 250
-    quit_root_height = 100
+    quit_root_width = 450
+    quit_root_height = 120
     quit_root_x = root.winfo_x() + (root_width // 2) - (quit_root_width // 2)
     quit_root_y = root.winfo_y() + (root_height // 2) - (quit_root_height // 2)
 
@@ -392,6 +396,7 @@ def confirm_quit():
     quit_root.geometry(f"{quit_root_width}x{quit_root_height}+{int(quit_root_x)}+{int(quit_root_y)}")
 
     label = tk.Label(quit_root, text="¿Desea guardar los cambios antes de salir?")
+    apply_violet_label(label)
     label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
     def save_and_quit():
@@ -399,7 +404,9 @@ def confirm_quit():
         root.quit()
 
     confirm_button = tk.Button(quit_root, text="Guardar Cambios", command=save_and_quit)
+    apply_violet_button(confirm_button)
     cancel_button = tk.Button(quit_root, text="Salir sin Guardar", command=root.quit)
+    apply_violet_button(cancel_button)
     confirm_button.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
     cancel_button.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
 
