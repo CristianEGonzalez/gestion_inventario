@@ -104,31 +104,26 @@ def add_prod(): # Función para agregar productos
 
 def delete_prod(): # Función para eliminar productos
     selected_items = product_tree.selection()
-    if selected_items != None: # != None es innecesario, lo puse sólo para ejemplificar que se puede usar optativamente
-        for item in selected_items:
-            # Obtener los valores de las columnas del elemento seleccionado
-            product_values = product_tree.item(item)["values"]
-            product_name = product_values[1]
+    for item in selected_items:
+        # Obtener los valores de las columnas del elemento seleccionado
+        product_values = product_tree.item(item)["values"]
+        product_name = product_values[1]
 
-            # Eliminar producto de la lista
-            product_tree.delete(item)
+        # Eliminar producto de la lista
+        product_tree.delete(item)
 
-            # Buscar el producto en el inventario (array)
-            for i in range(len(inventory)):
-                if inventory[i][1] == product_name:
-                    #Eliminar producto del inventario
-                    inventory[i] = [None, None, None, None]
-                    break
-        
-        # Agregar mensaje de confirmación a la salida
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, f"Producto(s) eliminado(s) del inventario.")
+        # Buscar el producto en el inventario (array)
+        for i in range(len(inventory)):
+            if inventory[i][1] == product_name:
+                #Eliminar producto del inventario
+                inventory[i] = [None, None, None, None]
+                break
+    
+    # Agregar mensaje de confirmación a la salida
+    output_text.delete("1.0", tk.END)
+    output_text.insert(tk.END, f"Producto(s) eliminado(s) del inventario.")
 
-        clean_entries()
-    else:
-        # Si no se seleccionó ningún producto, mensaje de error
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, f"Error: Debes seleccionar al menos un producto.")
+    clean_entries()
     
 def modify_stock(): # Función para modificar el stock
     selected_item = product_tree.selection()
@@ -372,6 +367,10 @@ def confirm_del():
         for selected_item in all_selected_items:
             product_info = product_tree.item(selected_item)["values"]
             delete_tree.insert("", tk.END, values=([product_info[0],product_info[1], product_info[2], product_info[3]]))
+    else:
+        # Si no se seleccionó ningún producto, mensaje de error
+        output_text.delete("1.0", tk.END)
+        output_text.insert(tk.END, f"Error: Debes seleccionar al menos un producto.")
 
 def confirm_quit():
     quit_root = tk.Toplevel()
