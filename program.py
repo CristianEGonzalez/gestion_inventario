@@ -315,7 +315,7 @@ def confirm_del():
         confirm_del_root.transient(root)
         # El usuario no puede usar la ventana principal hasta cerrar esta
         confirm_del_root.grab_set()
-        confirm_del_root.configure(bg="#E6E6FA")
+        apply_violet_bg(confirm_del_root)
 
         # Obtener las dimensiones de la ventana principal
         root_width = root.winfo_width()
@@ -379,7 +379,8 @@ def confirm_quit():
     quit_root.grab_set()
     quit_root.grid_columnconfigure(0, weight=1)  # Permitir que la columna 0 se expanda
     quit_root.grid_columnconfigure(1, weight=1)  # Permitir que la columna 1 se expanda
-    quit_root.configure(bg="#E6E6FA")
+    apply_violet_bg(quit_root)
+    
 
     # Obtener las dimensiones de la ventana principal
     root_width = root.winfo_width()
@@ -419,13 +420,16 @@ def apply_violet_entry(widget):
 
 def apply_violet_label(widget):
     widget.configure(bg="#E6E6FA", fg="#5D3FD3", font=("Times", 12, "bold"))
+    
+def apply_violet_bg(root):
+    root.configure(bg="#E6E6FA")
 
 def program():
     global root, name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
 
     root = tk.Tk()
     root.title("Gestión de Inventario")
-    root.configure(bg="#E6E6FA")
+    apply_violet_bg(root)
 
     # Obtener el ancho y alto de la pantalla
     screen_width = root.winfo_screenwidth()
@@ -441,15 +445,14 @@ def program():
     # Establecer la posición de la ventana
     root.geometry(f"+{x}+{y}")
 
-    menu = tk.Menu(root, bg="#E6E6FA", fg="black")  # Establecer colores de fondo y texto para el menú
-    menu2 = tk.Menu(menu, tearoff=0, bg="#E6E6FA", fg="black", font=("Times", 11))  # Establecer colores de fondo y texto para el submenú
+    menu = tk.Menu(root, fg="black")  # Establecer colores de fondo y texto para el menú
+    menu2 = tk.Menu(menu, tearoff=0, fg="black", font=("Times", 11))  # Establecer colores de fondo y texto para el submenú
     menu2.add_command(label="Guardar Inventario", command=save_inventory)
     menu2.add_command(label="Cargar Inventario", command=load_inventory)
     menu2.add_command(label="Salir", command=confirm_quit)
     menu.add_cascade(label="Archivo", menu=menu2)
     root.config(menu=menu)
-    
-
+    apply_violet_bg(menu2)
     
     # Crear los widgets
     name_label = tk.Label(root, text="Nombre del producto:")
