@@ -94,8 +94,7 @@ def add_prod(): # Función para agregar productos
 
     # Si no hay filas vacías crear nuevo inventario con una fila más y reasignarlo a inventory
     id = len(inventory)+1
-    new_inventory = np.vstack((inventory, [id, name, stock, price]))
-    inventory = new_inventory
+    inventory = np.vstack((inventory, [id, name, stock, price]))
 
     # Agregar el producto a la lista seleccionable
     product_tree.insert("", tk.END, values=([id,name,stock,price]))
