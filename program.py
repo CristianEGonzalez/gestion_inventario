@@ -2,6 +2,7 @@ import numpy as np
 import tkinter as tk
 from tkinter import ttk, filedialog
 import json
+from styles import *
 
 inventory = np.empty((1, 4), object) # Una matriz autoincrementable de 4 columnas
 
@@ -409,19 +410,6 @@ def confirm_quit():
     confirm_button.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
     cancel_button.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
 
-
-# Estilos para widgets
-def apply_violet_button(widget):
-    widget.configure(bg="#9B5DE5", fg="white", activebackground="#6A0572", relief="flat", font=("Calibri", 12, "bold"), bd=0, padx=10, pady=5, width=20)
-
-def apply_violet_entry(widget):
-    widget.configure(bg="#E0BBE4", fg="black", font=("Times", 11), relief="flat", highlightbackground="#9B5DE5", highlightcolor="#9B5DE5", highlightthickness=2)
-
-def apply_violet_label(widget):
-    widget.configure(bg="#E6E6FA", fg="#5D3FD3", font=("Times", 12, "bold"))
-    
-def apply_violet_bg(root):
-    root.configure(bg="#E6E6FA")
 
 def program():
     global root, name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
