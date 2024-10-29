@@ -13,6 +13,12 @@ def exist_prod(name):
     # Comprobar si el nombre del producto está en la columna
     return name in name_column
 
+def imprimir(texto):
+    output_text.config(state="normal")
+    output_text.delete("1.0", tk.END)
+    output_text.insert(tk.END, texto)
+    output_text.config(state="disabled")
+
 def show_inventory(): # Función para ver el inventario completo (después de utilizar una busqueda filtrada)
     # Eliminar todos los productos que se encuentran actualmente en la lista seleccionable
     product_tree.delete(*product_tree.get_children())
@@ -22,8 +28,7 @@ def show_inventory(): # Función para ver el inventario completo (después de ut
         if product[0] != None:
             product_tree.insert("", tk.END, values=([int(product[0]), product[1], int(product[2]), product[3]]))
     
-    output_text.delete("1.0", tk.END)
-    output_text.insert(tk.END, "Inventario completo:")
+    imprimir("Inventario completo: ")
 
 def search_prod(): # Función para filtrar en la lista seleccionable los productos que contengan determinado texto.
     search_term = search_entry.get().strip().lower()
@@ -33,8 +38,7 @@ def search_prod(): # Función para filtrar en la lista seleccionable los product
         if product[0] and (search_term in product[1].lower()):
             product_tree.insert("", tk.END, values=([int(product[0]), product[1], int(product[2]), product[3]]))
         
-    output_text.delete("1.0", tk.END)
-    output_text.insert(tk.END, f'Filtro actual: "{search_term}"')
+    imprimir(f'Filtro actual: "{search_term}"')
 
 def clean_entries():
     # Limpiar los campos de entrada y colocar foco en el name_entry (Se usa 0,tk.END para vaciar widgets Entry)
@@ -54,29 +58,24 @@ def add_prod(): # Función para agregar productos
     
         # Comprobar que el campo de nombre no esté vacío
         if not name:
-            output_text.delete("1.0", tk.END)
-            output_text.insert(tk.END, "Error: El nombre del producto no puede estar vacío")
+            imprimir("Error: El nombre del producto no puede estar vacío")
             return
     
     except ValueError:
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, "Error, por favor ingrese valores válidos para Stock y/o Precio")
+        imprimir("Error: Por favor, ingrese valores válidos para Stock y/o Precio")
         return
 
     # Comprobar si el producto ya existe en el inventario
     if exist_prod(name):
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, f'Error: El producto {name} ya existe en el inventario.')
+        imprimir(f'Error: El producto {name} ya existe en el inventario.')
         clean_entries()
         return
     
     if stock <= 0:
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, "Error: El valor de stock debe ser mayor a 0.")
+        imprimir("Error: El valor de stock debe ser mayor a 0.")
         return
     if price <= 0:
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, "Error: El precio del producto debe ser mayor a 0.")
+        imprimir("Error: El precio del producto debe ser mayor a 0.")
         return
     
     # Buscar la primera fila vacía en el inventario
@@ -88,6 +87,7 @@ def add_prod(): # Función para agregar productos
 
             # Agregar el producto a la lista seleccionable
             product_tree.insert("", tk.END, values=([id,name,stock,price]))
+            imprimir(f'El producto "{name}" ha sido agregado exitosamente.')
 
             clean_entries()
 
@@ -99,6 +99,7 @@ def add_prod(): # Función para agregar productos
 
     # Agregar el producto a la lista seleccionable
     product_tree.insert("", tk.END, values=([id,name,stock,price]))
+    imprimir(f'El producto "{name}" ha sido agregado exitosamente.')
 
     clean_entries()
 
@@ -120,8 +121,7 @@ def delete_prod(): # Función para eliminar productos
                 break
     
     # Agregar mensaje de confirmación a la salida
-    output_text.delete("1.0", tk.END)
-    output_text.insert(tk.END, f"Producto(s) eliminado(s) del inventario.")
+    imprimir(f"Producto(s) eliminado(s) del inventario.")
 
     clean_entries()
     
@@ -134,13 +134,11 @@ def modify_stock(): # Función para modificar el stock
             product_name = product_values[1]
             new_stock = int(stock_entry.get())
         except ValueError:
-            output_text.delete("1.0", tk.END)
-            output_text.insert(tk.END, "Error: Por favor, ingrese un valor válido para el stock.")
+            imprimir("Error: Por favor, ingrese un valor válido para el stock.")
             return
         
         if new_stock <= 0:
-            output_text.delete("1.0", tk.END)
-            output_text.insert(tk.END, "Error: El valor de stock debe ser mayor a 0.")
+            imprimir("Error: El valor de stock debe ser mayor a 0.")
         else:
             for i in range(len(inventory)):
                 if inventory[i][1] == product_name:
@@ -151,14 +149,12 @@ def modify_stock(): # Función para modificar el stock
                     product_tree.item(selected_item, values=(product_values[0],product_name, new_stock, product_values[3]))
 
                     # Agregar mensaje de confirmación a la salida
-                    output_text.delete("1.0", tk.END)
-                    output_text.insert(tk.END, f"Stock del producto '{product_name}' actualizado a {new_stock}.")
+                    imprimir(f"Stock del producto '{product_name}' actualizado a {new_stock}.")
                     
                     return
     else:
         # Si no hay un producto seleccionado, agregar mensaje de error a la salida
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, f"Error: Debes seleccionar un producto.")
+        imprimir("Error: Debes seleccionar un producto.")
 
 def modify_price(): # Función para modificar el precio
     selected_item = product_tree.selection()
@@ -169,13 +165,11 @@ def modify_price(): # Función para modificar el precio
             product_name = product_values[1]
             new_price = round(float(price_entry.get()), 2) # Limitar el precio a dos decimales
         except ValueError:
-            output_text.delete("1.0", tk.END)
-            output_text.insert(tk.END, "Error: Por favor, ingrese un valor válido para el stock.")
+            imprimir("Error: Por favor, ingrese un valor válido para el precio.")
             return
 
         if new_price <= 0:
-            output_text.delete("1.0", tk.END)
-            output_text.insert(tk.END, "Error: El valor de stock debe ser mayor a 0.")
+            imprimir("Error: El precio del producto debe ser mayor a 0.")
         else:
             for i in range(len(inventory)):
                 if inventory[i][1] == product_name:
@@ -186,14 +180,12 @@ def modify_price(): # Función para modificar el precio
                     product_tree.item(selected_item, values=(product_values[0],product_name, product_values[2], new_price))
 
                     # Agregar mensaje de confirmación a la salida
-                    output_text.delete("1.0", tk.END)
-                    output_text.insert(tk.END, f"Precio del producto '{product_name}' actualizado a {new_price}.")
+                    imprimir(f"Precio del producto '{product_name}' actualizado a {new_price}.")
 
                     return
     else:
         # Si no hay un producto seleccionado, agregar mensaje de error a la salida
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, f"Error: Debes seleccionar un producto.")
+        imprimir("Error: Debes seleccionar un producto.")
 
 def calculate_total_value(): # Función para calcular el valor total del inventario
     total_value = 0
@@ -204,8 +196,7 @@ def calculate_total_value(): # Función para calcular el valor total del inventa
             total_value += int(product[2]) * float(product[3])
     
     # Agregar el valor total a la salida
-    output_text.delete("1.0", tk.END)
-    output_text.insert(tk.END, f'El valor total del inventario es: ${total_value:.2f}')
+    imprimir(f'El valor total del inventario es: ${total_value:.2f}')
 
 def save_inventory():
     # Abrir un cuadro de diálogo para seleccionar la ubicación y nombre del archivo
@@ -231,8 +222,7 @@ def save_inventory():
             json.dump(inventory_data, f)
         
         # Agregar mensaje de confirmación a la salida
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, f'Inventario guardado en el archivo "{file_path}".')
+        imprimir(f'Inventario guardado en el archivo "{file_path}".')
     
     else:
         # Si el usuario cancela la operación no hacer nada
@@ -271,17 +261,14 @@ def load_inventory():
                 product_tree.insert("", i, text=product["name"], values=(product["id"], product["name"], product["stock"], product["price"]))
 
             # Agregar mensaje de confirmación a la salida
-            output_text.delete("1.0", tk.END)
-            output_text.insert(tk.END, f'Inventario cargado desde el archivo:\n "{file_path}".')
+            imprimir(f'Inventario cargado desde el archivo:\n "{file_path}".')
         
         except FileNotFoundError:
             # Si el archivo no existe, agregar un mensaje de error a la salida:
-            output_text.delete("1.0", tk.END)
-            output_text.insert(tk.END, "Error: El archivo seleccionado no se encontró.")
+            imprimir(f'Error: El archivo seleccionado no se encontró.')
         except json.JSONDecodeError:
             # Si hay un error al cargar los datos JSON, agregar un mensaje de error a la salida
-            output_text.delete("1.0", tk.END)
-            output_text.insert(tk.END, "Error: El archivo JSON está corrupto o tiene un formato incorrecto.")
+            imprimir(f'Error: El archivo JSON está corrupto o tiene un formato incorrecto.')
         
     else:
         # Si el usuario cancela la operación, no hacer nada
@@ -369,8 +356,7 @@ def confirm_del():
             delete_tree.insert("", tk.END, values=([product_info[0],product_info[1], product_info[2], product_info[3]]))
     else:
         # Si no se seleccionó ningún producto, mensaje de error
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, f"Error: Debes seleccionar al menos un producto.")
+        imprimir("Error: Debes seleccionar al menos un producto.")
 
 def confirm_quit():
     quit_root = tk.Toplevel()
