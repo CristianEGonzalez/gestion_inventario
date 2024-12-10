@@ -29,6 +29,23 @@ class Inventory:
     def modify_stock(self, name, new_stock):
         with self.conn:
             self.conn.execute("UPDATE inventory SET stock = ? WHERE name = ?", (new_stock, name)).rowcount
+    
+    def low_stock_report(self):
+        with self.conn:
+            low_stock = self.conn.execute("SELECT * FROM inventory WHERE stock < 5").fetchall()
+            return low_stock
+            
+    def modify_price(self, name, new_price):
+        with self.conn:
+            self.conn.execute("UPDATE inventory SET price = ? WHERE name = ?", (new_price, name)).rowcount
+            
+    def calculate_total_value(self):
+        with self.conn:
+            inventory = self.conn.execute("SELECT * FROM inventory").fetchall()
+            total_value = 0
+            for product in inventory:
+                total_value += product[2] * product[3]
+            return total_value
 
 
     def search_product(self, search_term):

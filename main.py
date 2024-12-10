@@ -17,6 +17,18 @@ def validate_stock():
         print_on_output("Error: El stock debe ser un número entero.")
         #return None
 
+def validate_price():
+    try:
+        new_price = float(price_entry.get())  # Intentar convertir la entrada a entero
+        if new_price > 0:  # Verificar que sea mayor a 0
+            return round(new_price, 2)
+        else:
+            print_on_output("Error: El stock debe ser un número entero positivo mayor a 0.")
+            #return None
+    except ValueError:
+        print_on_output("Error: El stock debe ser un número entero.")
+        #return None
+
 
 def name_product():
     while True:
@@ -79,11 +91,43 @@ def modify_stock():
             print_on_output(output)
             update_treeview()
         else:
-            print_on_output("Error: El stock debe ser un número entero positivo mayor a 0.")
+            print_on_output("Error: El stock debe ser un número entero mayor a 0.")
     else:
         print_on_output("Error: Debes seleccionar al menos un producto.")
 
- 
+def low_stock_report():
+    low_stock = my_inventory.low_stock_report()
+    print_on_output("Productos con stock menor a 5:")
+    output = ""
+    for product in low_stock:
+        output = output + f"{product[1]}: {product[3]}.\n"
+        print_on_output(output)
+
+def modify_price():
+    selected_items = product_tree.selection()
+    new_price = validate_price()
+    output = ""
+    if selected_items:
+        if new_price:
+            clean_entries()
+            for item in selected_items:
+                product_values = product_tree.item(item)["values"]
+                product_name = product_values[1]
+
+                my_inventory.modify_price(product_name, new_price)
+                output = output + f"Precio del producto '{product_name}' actualizado a {new_price}.\n"
+            
+            print_on_output(output)
+            update_treeview()
+        else:
+            print_on_output("Error: El precio debe ser un número mayor a 0.")
+    else:
+        print_on_output("Error: Debes seleccionar al menos un producto.")
+
+def calculate_total_value():
+    total_value = my_inventory.calculate_total_value()
+    print_on_output(f"El valor total del inventario es: {total_value}")
+
 def search_product():
     search_term = search_entry.get().strip().lower()
     
@@ -185,8 +229,8 @@ def print_on_output(texto):
     output_text.delete("1.0", tk.END)
     output_text.insert(tk.END, texto)
     output_text.config(state="disabled")
-    
-    
+
+
 def clean_entries():
     # Limpiar los campos de entrada y colocar foco en el name_entry (Se usa 0,tk.END para vaciar widgets Entry)
     name_entry.delete(0, tk.END)
@@ -201,7 +245,7 @@ def update_treeview():
     
     # Obtener los productos del inventario actualizado
     inventory = my_inventory.show_inventory()
-    
+
     # Insertar productos en el Treeview
     for item in inventory:
         product_tree.insert("", tk.END, values=(item[0], item[1], item[2], item[3]))
@@ -217,8 +261,8 @@ def orderBy(type):
     # Insertar productos en el Treeview
     for item in inventory:
         product_tree.insert("", tk.END, values=(item[0], item[1], item[2], item[3]))
-        
-        
+
+
 
 def main_menu():
     global root, name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
@@ -239,7 +283,6 @@ def main_menu():
 
     # Establecer la posición de la ventana
     root.geometry(f"+{x}+{y}")    
-    
     
     # Crear los widgets
     name_label = tk.Label(root, text="Nombre del producto:")
@@ -276,23 +319,23 @@ def main_menu():
     add_button = tk.Button(root, text="Agregar Producto", command=add_product)
     del_button = tk.Button(root, text="Eliminar Producto", command=confirm_del)
     modify_stock_button = tk.Button(root, text="Modificar Stock", command=modify_stock)
-    modify_price_button = tk.Button(root, text="Modificar Precio") #NO TIENE NINGUN COMANDO ASIGNADO
-    total_button = tk.Button(root, text="Calcular Valor Total") #NO TIENE NINGUN COMANDO ASIGNADO
-    show_inventory_button = tk.Button(root, text="Ver Inventario Completo")#NO TIENE NINGUN COMANDO ASIGNADO
+    modify_price_button = tk.Button(root, text="Modificar Precio", command=modify_price)
+    total_button = tk.Button(root, text="Calcular Valor Total", command=calculate_total_value) 
+    low_stock_button = tk.Button(root, text="Reporte de Bajo Stock", command=low_stock_report)
     add_button.grid(row=4, column=0, padx=5, pady=10)
     del_button.grid(row=4, column=1, padx=5, pady=10)
     modify_stock_button.grid(row=4, column=2, padx=5, pady=10)
     modify_price_button.grid(row=5, column=0, padx=5, pady=10)
     total_button.grid(row=5, column=1, padx=5, pady=10)
-    show_inventory_button.grid(row=5, column=2, padx=5, pady=10)
+    low_stock_button.grid(row=5, column=2, padx=5, pady=10)
     apply_violet_button(add_button)
     apply_violet_button(del_button)
     apply_violet_button(modify_stock_button)
     apply_violet_button(modify_price_button)
     apply_violet_button(total_button)
-    apply_violet_button(show_inventory_button)
+    apply_violet_button(low_stock_button)
     
-# Vincular el evento <Return> a la función add_prod() Para que al precionar **Enter** en cualquiera de estos campos agregue el producto
+    # Vincular el evento <Return> a la función add_prod() Para que al precionar **Enter** en cualquiera de estos campos agregue el producto
     name_entry.bind("<Return>", lambda event: add_product())
     stock_entry.bind("<Return>", lambda event: add_product())
     price_entry.bind("<Return>", lambda event: add_product())
@@ -302,7 +345,9 @@ def main_menu():
 
     output_text = tk.Text(root, height=3, width=50, highlightthickness=1, highlightbackground="gray", bg="#F3E8FF", fg="#5D3FD3", font=("Times", 12))
     output_text.grid(row=7, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
-
+    output_text_scrollbar = tk.Scrollbar(root, command=output_text.yview)
+    output_text_scrollbar.grid(row=7, column=3, padx=10, pady=10, sticky="ns")
+    output_text_scrollbar.configure(command=output_text.yview)
 
     # Crear un estilo para el Treeview
     style = ttk.Style()
