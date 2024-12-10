@@ -97,8 +97,7 @@ def modify_stock():
 
 def low_stock_report():
     low_stock = my_inventory.low_stock_report()
-    print_on_output("Productos con stock menor a 5:")
-    output = ""
+    output = "Productos con stock menor a 5:\n"
     for product in low_stock:
         output = output + f"{product[1]}: {product[3]}.\n"
         print_on_output(output)
@@ -126,11 +125,10 @@ def modify_price():
 
 def calculate_total_value():
     total_value = my_inventory.calculate_total_value()
-    print_on_output(f"El valor total del inventario es: {total_value}")
+    print_on_output(f"El valor total del inventario es: {round(total_value,2)}")
 
 def search_product():
     search_term = search_entry.get().strip().lower()
-    
     
     for row in product_tree.get_children():
         product_tree.delete(row)
@@ -144,19 +142,6 @@ def search_product():
 
 
 def delete_product():
-    selected_items = product_tree.selection()
-    for item in selected_items:
-        product_values = product_tree.item(item)["values"]
-        product_name = product_values[1]
-        
-        my_inventory.delete_product(product_name)
-    
-    print_on_output(f"Producto(s) eliminado(s) del inventario.")
-
-    clean_entries()
-    
-    
-def confirm_del():
     if product_tree.selection():
         # La nueva ventana Toplevel se asocia con la principal.
         confirm_del_root = tk.Toplevel(root)
@@ -185,10 +170,13 @@ def confirm_del():
 
         #Eliminacion de todos los productos seleccionados y actualización del treeview
         def confirm_and_destroy():
+            output = ""
             for product in delete_tree.get_children():
                 product_name = delete_tree.item(product)["values"][1]
                 my_inventory.delete_product(product_name)
+                output = output + f"Producto '{product_name}' eliminado.\n"
             confirm_del_root.destroy()
+            print_on_output(output)
             update_treeview()
 
         confirm_button = tk.Button(confirm_del_root, text="Confirmar", command=confirm_and_destroy)
@@ -317,7 +305,7 @@ def main_menu():
     search_button.grid(row=3, column=2, padx=10, pady=10)
 
     add_button = tk.Button(root, text="Agregar Producto", command=add_product)
-    del_button = tk.Button(root, text="Eliminar Producto", command=confirm_del)
+    del_button = tk.Button(root, text="Eliminar Producto", command=delete_product)
     modify_stock_button = tk.Button(root, text="Modificar Stock", command=modify_stock)
     modify_price_button = tk.Button(root, text="Modificar Precio", command=modify_price)
     total_button = tk.Button(root, text="Calcular Valor Total", command=calculate_total_value) 
@@ -369,7 +357,7 @@ def main_menu():
     product_tree_scrollbar = tk.Scrollbar(root, command=product_tree.yview)
 
     # Vincular el evento <Delete> a la función delete_prod() Presionar Delete activa la función
-    product_tree.bind("<Delete>", lambda event: confirm_del())        
+    product_tree.bind("<Delete>", lambda event: delete_product())        
     
     # Establecer el título de las columnas
     product_tree.heading("ID", text="ID", command=lambda: update_treeview())

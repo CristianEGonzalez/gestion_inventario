@@ -20,15 +20,13 @@ class Inventory:
         with self.conn:
             self.conn.execute("INSERT INTO inventory (name, price, stock) VALUES (?, ?, ?)", (name, price, stock))
 
-
     def delete_product(self, name):
         with self.conn:
-            self.conn.execute("DELETE FROM inventory WHERE name = ?", (name,)).rowcount
-
+            self.conn.execute("DELETE FROM inventory WHERE name = ?", (name,))
 
     def modify_stock(self, name, new_stock):
         with self.conn:
-            self.conn.execute("UPDATE inventory SET stock = ? WHERE name = ?", (new_stock, name)).rowcount
+            self.conn.execute("UPDATE inventory SET stock = ? WHERE name = ?", (new_stock, name))
     
     def low_stock_report(self):
         with self.conn:
@@ -37,7 +35,7 @@ class Inventory:
             
     def modify_price(self, name, new_price):
         with self.conn:
-            self.conn.execute("UPDATE inventory SET price = ? WHERE name = ?", (new_price, name)).rowcount
+            self.conn.execute("UPDATE inventory SET price = ? WHERE name = ?", (new_price, name))
             
     def calculate_total_value(self):
         with self.conn:
