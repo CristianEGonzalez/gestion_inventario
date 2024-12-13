@@ -7,27 +7,23 @@ my_inventory = Inventory()
 
 def validate_stock():
     try:
-        new_stock = int(stock_entry.get())  # Intentar convertir la entrada a entero
-        if new_stock > 0:  # Verificar que sea mayor a 0
+        new_stock = int(stock_entry.get()) 
+        if new_stock > 0:  
             return new_stock
         else:
             print_on_output("Error: El stock debe ser un número entero positivo mayor a 0.")
-            #return None
     except ValueError:
         print_on_output("Error: El stock debe ser un número entero.")
-        #return None
 
 def validate_price():
     try:
-        new_price = float(price_entry.get())  # Intentar convertir la entrada a entero
-        if new_price > 0:  # Verificar que sea mayor a 0
+        new_price = float(price_entry.get())
+        if new_price > 0:
             return round(new_price, 2)
         else:
             print_on_output("Error: El stock debe ser un número entero positivo mayor a 0.")
-            #return None
     except ValueError:
         print_on_output("Error: El stock debe ser un número entero.")
-        #return None
 
 
 def name_product():
@@ -52,7 +48,6 @@ def add_product():
         print_on_output("Error: Por favor, ingrese valores válidos para Stock y/o Precio")
         return
 
-    # Comprobar si el producto ya existe en el inventario
     if my_inventory.exist_product(name):
         print_on_output(f'Error: El producto {name} ya existe en el inventario.')
         clean_entries()
@@ -95,12 +90,14 @@ def modify_stock():
     else:
         print_on_output("Error: Debes seleccionar al menos un producto.")
 
+
 def low_stock_report():
     low_stock = my_inventory.low_stock_report()
     output = "Productos con stock menor a 5:\n"
     for product in low_stock:
         output = output + f"{product[1]}: {product[3]}.\n"
         print_on_output(output)
+
 
 def modify_price():
     selected_items = product_tree.selection()
@@ -123,9 +120,11 @@ def modify_price():
     else:
         print_on_output("Error: Debes seleccionar al menos un producto.")
 
+
 def calculate_total_value():
     total_value = my_inventory.calculate_total_value()
     print_on_output(f"El valor total del inventario es: {round(total_value,2)}")
+
 
 def search_product():
     search_term = search_entry.get().strip().lower()
@@ -179,6 +178,7 @@ def delete_product():
             print_on_output(output)
             update_treeview()
 
+        # Tkinter interfaz para confirmar la eliminación de productos
         confirm_button = tk.Button(confirm_del_root, text="Confirmar", command=confirm_and_destroy)
         confirm_button.grid(row=1, column=0)
         apply_violet_button(confirm_button)
@@ -251,7 +251,6 @@ def orderBy(type):
         product_tree.insert("", tk.END, values=(item[0], item[1], item[2], item[3]))
 
 
-
 def main_menu():
     global root, name_entry, stock_entry, price_entry, output_text, search_entry, product_tree
 
@@ -263,11 +262,11 @@ def main_menu():
     screen_height = root.winfo_screenheight()
 
     # Calcular la posición x para centrar horizontalmente
-    x = (screen_width - root.winfo_reqwidth()) // 2
+    x = (screen_width - root.winfo_reqwidth()) // 3
 
     # Calcular la posición y para que la ventana quede un poco por encima del centro
     window_height = root.winfo_reqheight()
-    y = (screen_height - window_height) // 4
+    y = (screen_height - window_height) // 5
 
     # Establecer la posición de la ventana
     root.geometry(f"+{x}+{y}")    

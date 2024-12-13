@@ -22,7 +22,7 @@ class Inventory:
 
     def delete_product(self, name):
         with self.conn:
-            self.conn.execute("DELETE FROM inventory WHERE name = ?", (name,))
+            self.conn.execute("DELETE FROM inventory WHERE name = ?", (name,)) # Comma is needed for single element tuple
 
     def modify_stock(self, name, new_stock):
         with self.conn:
