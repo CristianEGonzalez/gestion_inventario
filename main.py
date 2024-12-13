@@ -256,20 +256,27 @@ def main_menu():
 
     root = tk.Tk()
     root.title("Gestión de Inventario")
-    
+
+    # Configurar el tamaño inicial de la ventana
+    root.geometry("620x700")
+
+    # Asegurarse de que las dimensiones de la ventana estén actualizadas
+    root.update_idletasks()
+
     # Obtener el ancho y alto de la pantalla
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
 
-    # Calcular la posición x para centrar horizontalmente
-    x = (screen_width - root.winfo_reqwidth()) // 3
+    # Obtener el ancho y alto de la ventana
+    window_width = root.winfo_width()
+    window_height = root.winfo_height()
 
-    # Calcular la posición y para que la ventana quede un poco por encima del centro
-    window_height = root.winfo_reqheight()
-    y = (screen_height - window_height) // 5
+    # Calcular las coordenadas para centrar la ventana
+    x = (screen_width - window_width) // 2
+    y = (screen_height - window_height) // 2
 
-    # Establecer la posición de la ventana
-    root.geometry(f"+{x}+{y}")    
+    # Ajustar la posición de la ventana
+    root.geometry(f"{window_width}x{window_height}+{x}+{y}")
     
     # Crear los widgets
     name_label = tk.Label(root, text="Nombre del producto:")
@@ -332,7 +339,7 @@ def main_menu():
 
     output_text = tk.Text(root, height=3, width=50, highlightthickness=1, highlightbackground="gray", bg="#F3E8FF", fg="#5D3FD3", font=("Times", 12))
     output_text.grid(row=7, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
-    output_text_scrollbar = tk.Scrollbar(root, command=output_text.yview)
+    output_text_scrollbar = ttk.Scrollbar(root, orient="vertical", command=output_text.yview)
     output_text_scrollbar.grid(row=7, column=3, padx=10, pady=10, sticky="ns")
     output_text_scrollbar.configure(command=output_text.yview)
 
@@ -353,7 +360,7 @@ def main_menu():
 
     # Crear Treeview (Lista seleccionable)
     product_tree = ttk.Treeview(root, columns=("ID", "Nombre", "Precio", "Stock"), show="headings")
-    product_tree_scrollbar = tk.Scrollbar(root, command=product_tree.yview)
+    product_tree_scrollbar = ttk.Scrollbar(root, command=product_tree.yview)
 
     # Vincular el evento <Delete> a la función delete_prod() Presionar Delete activa la función
     product_tree.bind("<Delete>", lambda event: delete_product())        
@@ -384,7 +391,12 @@ def main_menu():
     # Al iniciar el programa coloca el foco en el primer campo (Entry)
     name_entry.focus_set()
     
+    # Configurar el peso de las columnas 0,1 y 2 para que todas se redimensionen proporcionalmente
+    for col in range(3):
+        root.grid_columnconfigure(col, weight=1)
+
     update_treeview()
+    
     root.mainloop()
 
 
