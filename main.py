@@ -5,68 +5,79 @@ from styles import *
 
 my_inventory = Inventory()
 
+def name_product():
+    product_name = name_entry.get().strip().title()  # Obtener y limpiar el texto
+    if product_name:  # Verificar si está vacío
+        return product_name
+    else:
+        print_on_output("Error: El nombre del producto no puede estar vacío.")
+        return None
+    
+    
 def validate_stock():
     try:
-        new_stock = int(stock_entry.get()) 
+        stock_value = stock_entry.get().strip()  # Obtener y limpiar el texto
+        if not stock_value:  # Verificar si está vacío
+            print_on_output("Error: El campo de stock no puede estar vacío.")
+            return None
+        
+        new_stock = int(stock_value)
         if new_stock > 0:  
             return new_stock
         else:
-            print_on_output("Error: El stock debe ser un número entero positivo mayor a 0.")
+            print_on_output("Error: El stock debe ser un número entero mayor a 0.")
+            return None            
     except ValueError:
-        print_on_output("Error: El stock debe ser un número entero.")
+        print_on_output("Error: El stock debe ser numérico.")
+        return None
+
 
 def validate_price():
     try:
-        new_price = float(price_entry.get())
+        price_value = price_entry.get().strip()  # Obtener y limpiar el texto
+        if not price_value:  # Verificar si está vacío
+            print_on_output("Error: El campo de precio no puede estar vacío.")
+            return None
+
+        new_price = float(price_value)
         if new_price > 0:
             return round(new_price, 2)
         else:
-            print_on_output("Error: El stock debe ser un número entero positivo mayor a 0.")
+            print_on_output("Error: El precio debe ser un número real mayor a 0.")
+            return None
     except ValueError:
-        print_on_output("Error: El stock debe ser un número entero.")
+        print_on_output("Error: El precio debe ser numérico.")
+        return None
 
-
-def name_product():
-    while True:
-        product_name = name_entry.get().strip().title()
-        if product_name:
-            return product_name
-        else:
-            print("Por favor ingrese un nombre de producto válido.")
 
 def add_product():
     try:
-        name = name_entry.get().strip().title()
-        stock = int(stock_entry.get())
-        price = round(float(price_entry.get()), 2) 
-    
-        if not name:
-            print_on_output("Error: El nombre del producto no puede estar vacío")
+        name = name_product()
+        if name is None:
+            return
+        stock = validate_stock()
+        if stock is None:
+            return
+        price = validate_price()
+        if price is None:
             return
     
-    except ValueError:
-        print_on_output("Error: Por favor, ingrese valores válidos para Stock y/o Precio")
-        return
+        if my_inventory.exist_product(name):
+            print_on_output(f'Error: El producto {name} ya existe en el inventario.')
+            clean_entries()
+            return
 
-    if my_inventory.exist_product(name):
-        print_on_output(f'Error: El producto {name} ya existe en el inventario.')
+        # Agregar a la base de datos
+        my_inventory.add_product(name, price, stock)
+        print_on_output(f'El producto "{name}" ha sido agregado exitosamente.')
         clean_entries()
-        return
-    
-    if stock <= 0:
-        print_on_output("Error: El valor de stock debe ser mayor a 0.")
-        return
-    if price <= 0:
-        print_on_output("Error: El precio del producto debe ser mayor a 0.")
-        return
-    
-    #Agregar a la base de datos
-    my_inventory.add_product(name, price, stock)
-    print_on_output(f'El producto "{name}" ha sido agregado exitosamente.')
-    clean_entries()
-    update_treeview()
+        update_treeview()
+        
+    except Exception as e:
+        print_on_output(f"Error inesperado: {e}")
 
     return
+
 
 
 def modify_stock():
@@ -86,7 +97,7 @@ def modify_stock():
             print_on_output(output)
             update_treeview()
         else:
-            print_on_output("Error: El stock debe ser un número entero mayor a 0.")
+            return
     else:
         print_on_output("Error: Debes seleccionar al menos un producto.")
 
@@ -116,7 +127,7 @@ def modify_price():
             print_on_output(output)
             update_treeview()
         else:
-            print_on_output("Error: El precio debe ser un número mayor a 0.")
+            return
     else:
         print_on_output("Error: Debes seleccionar al menos un producto.")
 
